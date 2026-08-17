@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nothing Mockup Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bangers&family=Bebas+Neue&family=Codystar&family=Courgette&family=Creepster&family=Dancing+Script:wght@400;700&family=Eater&family=Great+Vibes&family=Kaushan+Script&family=Lobster&family=Luckiest+Guy&family=Marck+Script&family=Pacifico&family=Parisienne&family=Playball&family=Quintessential&family=Righteous&family=Rouge+Script&family=Rye&family=Satisfy&family=Stalemate&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000;
+      --card: #0c0c0c;
+      --text: #fff;
+      --border: #1a1a1a;
+      --accent: #ff0000;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'VT323', monospace;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 20px;
+      position: relative;
+    }
+    h2 { font-size: 2rem; margin-bottom: 5px; text-transform: uppercase; }
+    p.subtitle { opacity: 0.5; font-size: 0.9rem; margin-bottom: 20px; letter-spacing: 1px; font-family: monospace; text-transform: uppercase; }
+    
+    /* Canvas Viewport */
+    .editor-scale-container {
+      width: 100%;
+      aspect-ratio: 1/1;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #c0392b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+    }
+    .editor-export-area {
+      width: 1000px;
+      height: 1000px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+      transform: scale(0.48);
+    }
+    .editor-bg-layer {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #c0392b; z-index: 0;
+    }
+    .editor-effect-layer {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; transition: all 0.3s ease;
+    }
+    .editor-phone-wrapper {
+      position: absolute; top: 0px; left: 0px; width: 1000px; height: 1000px; transform: scale(0.75); transform-origin: center; z-index: 2;
+    }
+    .editor-screen-mask {
+      position: absolute; overflow: hidden; z-index: 1;
+    }
+    .editor-screen-mask img {
+      position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: none; object-fit: cover; object-position: center;
+    }
+    .editor-proc-frame {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; object-fit: cover; pointer-events: none;
+    }
+    .wm-container {
+      position: absolute; width: 100%; height: 100%; z-index: 3; pointer-events: none;
+    }
+    .upload-hint {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4;
+      text-align: center; color: var(--text); font-size: 24px; cursor: pointer;
+      background: rgba(0,0,0,0.8); padding: 15px 25px; border-radius: 12px; border: 1px solid var(--border);
+    }
+
+    /* Floating Toolbar */
+    .floating-btn {
+      position: absolute; bottom: 15px; right: 15px; z-index: 10;
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .editor-tools-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 15px; margin-top: 15px;
+      display: flex; flex-direction: column; gap: 15px;
+    }
+    .mockup-toolbar {
+      display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .mockup-tool-btn {
+      height: 44px; width: 44px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+    }
+    .mockup-tool-btn:hover { background: var(--border); }
+    .mockup-gen-btn {
+      background: var(--text); color: var(--bg); border: none; padding: 14px 20px; border-radius: 16px;
+      font-family: 'VT323', monospace; font-size: 1.3rem; cursor: pointer; width: 100%; display: flex;
+      justify-content: center; align-items: center; gap: 10px; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Mockup Editor</h2>
+  <p class="subtitle">Nothing Device Mockup Generator</p>
+
+  <div class="editor-scale-container" id="editorScaleContainer">
+    <div class="editor-export-area" id="editorExportArea">
+      <div class="editor-bg-layer" id="editorBgLayer"></div>
+      <div class="editor-effect-layer" id="editorEffectLayer"></div>
+      
+      <div class="editor-phone-wrapper" id="editorPhoneWrapper">
+        <div class="editor-screen-mask" id="editorScreenMask">
+          <img id="editorProcUserImg" src="" alt="User Screenshot">
+        </div>
+        <img id="editorProcFrameImg" src="" alt="Phone Frame">
+      </div>
+      
+      <div class="wm-container" id="wmContainer">
+        <div id="wmTopLeft" style="position: absolute; top: 85px; left: 85px; color: rgba(255,255,255,0.8); font-size: 30px;"></div>
+        <div id="wmTopRight" style="position: absolute; top: 85px; right: 85px; color: rgba(255,255,255,0.8); font-size: 30px;"></div>
+        <div id="wmBotCenter" style="position: absolute; bottom: 55px; width: 100%; text-align: center; color: rgba(255,255,255,0.8); font-size: 30px;"></div>
+      </div>
+      
+      <div class="upload-hint" id="editorUploadHint" onclick="document.getElementById('editorSSInput').click()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i><br>TAP TO ADD IMAGE
+      </div>
+    </div>
+    
+    <button class="floating-btn" id="editorMainToggleBtn"><i class="fa-solid fa-pen"></i></button>
+  </div>
+
+  <input type="file" id="editorSSInput" accept="image/*" hidden>
+
+  <!-- Control Tools -->
+  <div class="editor-tools-card" id="mockupToolbar">
+    <div class="mockup-toolbar">
+      <button class="mockup-tool-btn" title="Device"><i class="fa-solid fa-mobile-screen"></i></button>
+      <button class="mockup-tool-btn" title="Toggle Side"><i class="fa-solid fa-clone"></i></button>
+      <button class="mockup-tool-btn" title="Color"><i class="fa-solid fa-palette"></i></button>
+      <button class="mockup-tool-btn" title="Effects"><i class="fa-solid fa-splotch"></i></button>
+      <button class="mockup-tool-btn" title="Watermark"><b style="font-family:monospace; font-size:1.2rem;">A</b></button>
+      <button class="mockup-tool-btn" title="Visibility"><i class="fa-solid fa-eye"></i></button>
+      <button class="mockup-tool-btn" title="Shadow"><i class="fa-solid fa-lightbulb"></i></button>
+      <button class="mockup-tool-btn" title="Random Background"><i class="fa-solid fa-dice"></i></button>
+    </div>
+    <button class="mockup-gen-btn"><i class="fa-solid fa-mobile-screen"></i> GENERATE MOCKUP</button>
+  </div>
+</div>
+
+</body>
+</html>
