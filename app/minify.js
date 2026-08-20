@@ -1,5 +1,5 @@
 /* =========================================================
-   minify.js — Nothing Space Mockup Editor
+   minify.js — Nothing Space Mockup Editor  v2
    ========================================================= */
 
 /* ----------------------------------------------------------
@@ -18,7 +18,6 @@ function toggleTheme() {
     localStorage.setItem("n-theme", "dark");
   }
 }
-
 (function initTheme() {
   const saved = localStorage.getItem("n-theme") || "light";
   document.documentElement.setAttribute("data-theme", saved);
@@ -44,14 +43,12 @@ function openScreen(id) {
   requestAnimationFrame(() => el.classList.add("active"));
   document.body.style.overflow = "hidden";
 }
-
 function closeScreen(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.remove("active");
   setTimeout(() => { el.style.display = "none"; document.body.style.overflow = ""; }, 300);
 }
-
 document.addEventListener("click", function (e) {
   if (e.target && e.target.classList.contains("screen")) {
     const id = e.target.id;
@@ -59,13 +56,10 @@ document.addEventListener("click", function (e) {
   }
 });
 
-/* ----------------------------------------------------------
-   4. BOT FEED / EDITOR OPENER
-   ---------------------------------------------------------- */
 function openBotFeed() { openScreen("botFeedScr"); }
 
 /* ----------------------------------------------------------
-   5. ANIMATED BACKGROUND (stars canvas)
+   4. ANIMATED BACKGROUND
    ---------------------------------------------------------- */
 (function initStars() {
   const container = document.querySelector(".stars-container");
@@ -73,11 +67,9 @@ function openBotFeed() { openScreen("botFeedScr"); }
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   container.appendChild(canvas);
-
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize();
   window.addEventListener("resize", resize);
-
   const stars = Array.from({ length: 80 }, () => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
@@ -85,7 +77,6 @@ function openBotFeed() { openScreen("botFeedScr"); }
     a: Math.random(),
     da: (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1),
   }));
-
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -103,7 +94,10 @@ function openBotFeed() { openScreen("botFeedScr"); }
 })();
 
 /* ----------------------------------------------------------
-   6. DEVICE CATALOG
+   5. DEVICE CATALOG
+   Screen mask: x,y = top-left of phone screen inside the 1000x1000 phone wrapper
+   w,h = width/height of the screen area (where screenshot shows)
+   borderRadius = corner radius of the screen in px (within 1000px space)
    ---------------------------------------------------------- */
 const DEVICES = [
   { id: "p1",      name: "NP (1)",             f: "../assets/mockup/p1_f.png",      b: "../assets/mockup/p1_b.png" },
@@ -122,58 +116,60 @@ const DEVICES = [
   { id: "3apro",   name: "CMF Phone (3a Pro)", f: "../assets/mockup/3apro_f.png",   b: "../assets/mockup/3apro_b.png" },
 ];
 
+// Phone screen area within the 1000x1000 phone-wrapper (phone is rendered at full 1000x1000 with object-fit:cover)
+// These values define exactly WHERE the screen is on each phone image
+// x,y = top-left corner of screen; w,h = screen dimensions; r = border radius
 const SCREEN_MASKS = {
-  p1:      { x: 86, y: 80, w: 828, h: 840 },
-  p2:      { x: 86, y: 80, w: 828, h: 840 },
-  p2a:     { x: 86, y: 80, w: 828, h: 840 },
-  p2aplus: { x: 86, y: 80, w: 828, h: 840 },
-  p3:      { x: 86, y: 80, w: 828, h: 840 },
-  p3a:     { x: 86, y: 80, w: 828, h: 840 },
-  p3alite: { x: 86, y: 80, w: 828, h: 840 },
-  p3apro:  { x: 86, y: 80, w: 828, h: 840 },
-  p4a:     { x: 86, y: 80, w: 828, h: 840 },
-  p4apro:  { x: 86, y: 80, w: 828, h: 840 },
-  p4b:     { x: 86, y: 80, w: 828, h: 840 },
-  cmf1:    { x: 86, y: 80, w: 828, h: 840 },
-  cmf2:    { x: 86, y: 80, w: 828, h: 840 },
-  "3apro": { x: 86, y: 80, w: 828, h: 840 },
+  p1:      { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p2:      { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p2a:     { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p2aplus: { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p3:      { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p3a:     { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p3alite: { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p3apro:  { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p4a:     { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p4apro:  { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  p4b:     { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  cmf1:    { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  cmf2:    { x: 115, y: 90,  w: 770, h: 820, r: 38 },
+  "3apro": { x: 115, y: 90,  w: 770, h: 820, r: 38 },
 };
 
 /* ----------------------------------------------------------
-   7. EDITOR STATE
+   6. EDITOR STATE
    ---------------------------------------------------------- */
 let editorReady = false;
 let currentDeviceId = "p2";
 let currentSide = "f";
 let phoneShadowOn = false;
 let wmVisible = true;
+let phoneZoomed = false;   // eye = zoom + hide wm
 let toolbarVisible = true;
 let activePopup = null;
 let activeBtn = null;
 let bubbleInterval = null;
 
 /* ----------------------------------------------------------
-   8. SCALE EDITOR — fit 1000×1000 export area into container
+   7. SCALE EDITOR — fit 1000x1000 into container
    ---------------------------------------------------------- */
 function scaleEditor() {
   const container = document.getElementById("editorScaleContainer");
   const exportArea = document.getElementById("editorExportArea");
   if (!container || !exportArea) return;
-  // Use parent width so container can shrink below max-width on small screens
-  const parentW = container.parentElement ? container.parentElement.offsetWidth - 20 : 460;
+  const parentW = container.parentElement ? container.parentElement.offsetWidth - 22 : 460;
   const size = Math.min(container.offsetWidth || container.getBoundingClientRect().width || parentW, 480);
-  if (size < 10) return; // not yet rendered
+  if (size < 10) return;
   const scale = size / 1000;
   exportArea.style.transform = `scale(${scale})`;
   exportArea.style.transformOrigin = "top left";
   container.style.width = size + "px";
   container.style.height = size + "px";
 }
-
 window.addEventListener("resize", scaleEditor);
 
 /* ----------------------------------------------------------
-   9. INIT EDITOR MODE
+   8. INIT EDITOR MODE
    ---------------------------------------------------------- */
 function initEditorMode() {
   const btn = document.getElementById("initEditBtn");
@@ -186,11 +182,12 @@ function initEditorMode() {
     editorReady = true;
     loadDeviceList();
     applyDevice("p2", "f");
-    // Modal needs a tick to finish layout before we can measure
     requestAnimationFrame(() => {
       scaleEditor();
-      // Second pass in case font/resource loading shifted layout
-      setTimeout(scaleEditor, 120);
+      setTimeout(() => {
+        scaleEditor();
+        updateLiveWatermark();  // auto-populate device name + date
+      }, 200);
     });
   }
 }
@@ -215,46 +212,59 @@ function loadDeviceList() {
       currentDeviceId = d.id;
       applyDevice(d.id, currentSide);
       closeAllPopups();
+      updateAutoWatermark();
     });
     popup.appendChild(chip);
   });
 }
 
 /* ----------------------------------------------------------
-   11. APPLY DEVICE
+   10. APPLY DEVICE — load frame + fix screen mask
    ---------------------------------------------------------- */
 function applyDevice(deviceId, side) {
   const dev = DEVICES.find(d => d.id === deviceId);
   if (!dev) return;
+
   const frameImg = document.getElementById("editorProcFrameImg");
   const mask = document.getElementById("editorScreenMask");
   const hint = document.getElementById("editorUploadHint");
+
   const src = side === "f" ? dev.f : dev.b;
   if (frameImg) { frameImg.src = src; frameImg.style.opacity = "1"; }
+
   const m = SCREEN_MASKS[deviceId] || SCREEN_MASKS["p2"];
   if (mask) {
     mask.style.left = m.x + "px";
     mask.style.top = m.y + "px";
     mask.style.width = m.w + "px";
     mask.style.height = m.h + "px";
+    mask.style.borderRadius = (m.r || 38) + "px";
+    mask.style.overflow = "hidden";
   }
-  // Always show the upload hint unless user already uploaded a screenshot
+
+  // Show or hide the upload hint
   const userImg = document.getElementById("editorProcUserImg");
-  const hasScreenshot = userImg && userImg.src && userImg.src !== window.location.href;
+  const hasScreenshot = userImg && userImg.src && userImg.src.length > 10 && !userImg.src.endsWith("app/");
   if (hint) hint.style.display = hasScreenshot ? "none" : "flex";
-  // Re-apply scale in case container changed
+
+  // Update floating button icon
+  updateFloatingBtn(hasScreenshot);
+
   scaleEditor();
 }
 
 /* ----------------------------------------------------------
-   11. SIDE TOGGLE
+   11. SIDE TOGGLE (front / back)
    ---------------------------------------------------------- */
 function toggleEditorPhoneSide() {
   currentSide = currentSide === "f" ? "b" : "f";
   document.getElementById("editorPhoneSideVal").value = currentSide;
   applyDevice(currentDeviceId, currentSide);
   const icon = document.getElementById("editorPhoneIcon");
-  if (icon) { icon.style.transform = "rotateY(180deg)"; setTimeout(() => icon.style.transform = "", 400); }
+  if (icon) {
+    icon.style.transform = "rotateY(180deg)";
+    setTimeout(() => icon.style.transform = "", 400);
+  }
 }
 
 /* ----------------------------------------------------------
@@ -267,11 +277,23 @@ function handleEditorSSUpload(input) {
   reader.onload = function (e) {
     const userImg = document.getElementById("editorProcUserImg");
     const hint = document.getElementById("editorUploadHint");
-    if (userImg) { userImg.src = e.target.result; userImg.style.display = "block"; }
+    if (userImg) {
+      userImg.src = e.target.result;
+      userImg.style.display = "block";
+      userImg.style.objectFit = "cover";
+      userImg.style.objectPosition = "center";
+    }
     if (hint) hint.style.display = "none";
+    updateFloatingBtn(true);
   };
   reader.readAsDataURL(file);
   input.value = "";
+}
+
+function updateFloatingBtn(hasScreenshot) {
+  const icon = document.getElementById("editorToggleIcon");
+  if (!icon) return;
+  icon.className = hasScreenshot ? "fa-solid fa-image" : "fa-solid fa-arrow-up-from-bracket";
 }
 
 /* ----------------------------------------------------------
@@ -304,7 +326,6 @@ function setEditorBgSolid(color) {
   document.getElementById("editorBgGrad2").value = "";
   closeAllPopups();
 }
-
 function setRandomGradient() {
   const hue1 = Math.floor(Math.random() * 360);
   const hue2 = (hue1 + 40 + Math.floor(Math.random() * 80)) % 360;
@@ -330,7 +351,6 @@ const EFFECT_STYLES = {
   light:    "radial-gradient(ellipse at center,rgba(255,255,255,.18) 0%,transparent 70%)",
   darken:   "radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.6) 100%)",
 };
-
 function setEditorEffect(effect, el) {
   document.querySelectorAll(".effect-chip").forEach(c => c.classList.remove("active-chip"));
   if (el) el.classList.add("active-chip");
@@ -346,7 +366,6 @@ function setEditorEffect(effect, el) {
   layer.style.backgroundImage = EFFECT_STYLES[effect] || "";
   closeAllPopups();
 }
-
 function spawnBubbles(layer) {
   function makeBubble() {
     const b = document.createElement("div");
@@ -365,8 +384,35 @@ function spawnBubbles(layer) {
 }
 
 /* ----------------------------------------------------------
-   16. WATERMARK
+   16. WATERMARK — auto + manual
+   Auto watermark: device name top-left, date top-right, username bottom-center
    ---------------------------------------------------------- */
+function getFormattedDate() {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.toLocaleString("en", { month: "short" }).toUpperCase();
+  const year = now.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+function updateAutoWatermark() {
+  const tlEl = document.getElementById("wmTopLeft");
+  const trEl = document.getElementById("wmTopRight");
+  if (!wmVisible) return;
+  const dev = DEVICES.find(d => d.id === currentDeviceId);
+  const devName = dev ? dev.name.toUpperCase() : "";
+  // Device name top-left (auto)
+  if (tlEl) {
+    const span = tlEl.querySelector(".wm-auto-device");
+    if (span) span.textContent = devName;
+  }
+  // Date top-right (auto)
+  if (trEl) {
+    const span = trEl.querySelector(".wm-auto-date");
+    if (span) span.textContent = getFormattedDate();
+  }
+}
+
 function updateLiveWatermark() {
   const input = document.getElementById("editorWmInput");
   const fontRadio = document.querySelector("input[name=editorFont]:checked");
@@ -374,41 +420,90 @@ function updateLiveWatermark() {
   const tlEl = document.getElementById("wmTopLeft");
   const trEl = document.getElementById("wmTopRight");
   const bcEl = document.getElementById("wmBotCenter");
+
   const text = input ? input.value.trim() : "";
   const font = fontRadio ? fontRadio.value : "'Pacifico',cursive";
-  const hasLogo = logoPrev && logoPrev.style.display !== "none" && logoPrev.src;
+  const hasLogo = logoPrev && logoPrev.style.display !== "none" && logoPrev.src && logoPrev.src.length > 5;
+
+  // Rebuild all wm elements
   if (tlEl) tlEl.innerHTML = "";
   if (trEl) trEl.innerHTML = "";
   if (bcEl) bcEl.innerHTML = "";
   if (!wmVisible) return;
-  function makeText() {
-    const span = document.createElement("span");
-    span.textContent = text;
-    span.style.fontFamily = font;
-    span.style.fontSize = "32px";
-    span.style.color = "rgba(255,255,255,.85)";
-    span.style.textShadow = "0 2px 8px rgba(0,0,0,.5)";
-    span.style.textTransform = "none";
-    return span;
+
+  const makeSpan = (t, extra) => {
+    const s = document.createElement("span");
+    s.textContent = t;
+    s.style.fontFamily = font;
+    s.style.fontSize = "34px";
+    s.style.color = "rgba(255,255,255,0.9)";
+    s.style.textShadow = "0 2px 10px rgba(0,0,0,0.6)";
+    s.style.textTransform = "none";
+    s.style.lineHeight = "1";
+    if (extra) Object.assign(s.style, extra);
+    return s;
+  };
+
+  const dev = DEVICES.find(d => d.id === currentDeviceId);
+  const devName = dev ? dev.name.toUpperCase() : "";
+  const dateStr = getFormattedDate();
+
+  // Top-left: device name (auto) + optional user text below
+  if (tlEl) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;flex-direction:column;gap:6px;text-align:left;";
+    const devSpan = makeSpan(devName, { className: "wm-auto-device", fontSize: "30px", opacity: "0.85" });
+    devSpan.className = "wm-auto-device";
+    wrap.appendChild(devSpan);
+    tlEl.appendChild(wrap);
   }
-  if (text) { if (tlEl) tlEl.appendChild(makeText()); if (trEl) trEl.appendChild(makeText()); }
+
+  // Top-right: date (auto)
+  if (trEl) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "text-align:right;";
+    const dateSpan = makeSpan(dateStr, { fontSize: "30px", opacity: "0.85" });
+    dateSpan.className = "wm-auto-date";
+    wrap.appendChild(dateSpan);
+    trEl.appendChild(wrap);
+  }
+
+  // Bottom-center: logo + user text
   if (bcEl && (text || hasLogo)) {
     if (hasLogo) {
       const img = document.createElement("img");
       img.src = logoPrev.src;
-      img.style.cssText = "width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.5);";
+      img.style.cssText = "width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5);flex-shrink:0;";
       bcEl.appendChild(img);
     }
-    if (text) bcEl.appendChild(makeText());
+    if (text) bcEl.appendChild(makeSpan(text));
   }
 }
 
+/* ----------------------------------------------------------
+   17. EYE BUTTON — toggle watermark AND zoom phone
+   ---------------------------------------------------------- */
 function toggleWatermarkVisibility() {
-  wmVisible = !wmVisible;
+  phoneZoomed = !phoneZoomed;
+  wmVisible = !phoneZoomed;
+
   const icon = document.getElementById("wmEyeIcon");
-  if (icon) icon.className = wmVisible ? "fa-solid fa-eye" : "fa-solid fa-eye-slash";
-  const container = document.getElementById("wmContainer");
-  if (container) container.style.opacity = wmVisible ? "1" : "0";
+  const wmContainer = document.getElementById("wmContainer");
+  const phoneWrapper = document.getElementById("editorPhoneWrapper");
+
+  if (icon) icon.className = phoneZoomed ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+
+  // Hide/show watermark
+  if (wmContainer) wmContainer.style.opacity = wmVisible ? "1" : "0";
+
+  // Zoom phone: scale(0.75) normal, scale(0.95) zoomed to fill canvas
+  if (phoneWrapper) {
+    phoneWrapper.style.transition = "transform 0.4s cubic-bezier(0.25,1,0.5,1)";
+    phoneWrapper.style.transform = phoneZoomed ? "scale(0.95)" : "scale(0.75)";
+  }
+
+  // Rebuild watermark to refresh auto labels
+  if (wmVisible) updateLiveWatermark();
 }
 
 function selectEditorFontChip(el) {
@@ -420,55 +515,65 @@ function selectEditorFontChip(el) {
 }
 
 /* ----------------------------------------------------------
-   17. PHONE SHADOW
+   18. PHONE SHADOW
    ---------------------------------------------------------- */
 function togglePhoneShadow() {
   phoneShadowOn = !phoneShadowOn;
   const wrapper = document.getElementById("editorPhoneWrapper");
   const icon = document.getElementById("shadowToggleIcon");
-  if (wrapper) wrapper.style.filter = phoneShadowOn ? "drop-shadow(0 40px 60px rgba(0,0,0,.7)) drop-shadow(0 10px 20px rgba(0,0,0,.5))" : "none";
+  if (wrapper) wrapper.style.filter = phoneShadowOn
+    ? "drop-shadow(0 40px 60px rgba(0,0,0,.7)) drop-shadow(0 10px 20px rgba(0,0,0,.5))"
+    : "none";
   if (icon) icon.style.color = phoneShadowOn ? "var(--accent)" : "";
 }
 
 /* ----------------------------------------------------------
-   18. FLOATING BUTTON
+   19. FLOATING BUTTON — re-opens upload when screenshot loaded
    ---------------------------------------------------------- */
 function handleFloatingBtnClick() {
-  toolbarVisible = !toolbarVisible;
-  const toolbar = document.getElementById("mockupToolbar");
-  if (toolbar) toolbar.style.display = toolbarVisible ? "block" : "none";
-  const icon = document.getElementById("editorToggleIcon");
-  if (icon) icon.className = toolbarVisible ? "fa-solid fa-pen" : "fa-solid fa-chevron-down";
+  const userImg = document.getElementById("editorProcUserImg");
+  const hasScreenshot = userImg && userImg.src && userImg.src.length > 10 && !userImg.src.endsWith("app/");
+  if (hasScreenshot) {
+    // Tap again = re-upload
+    document.getElementById("editorSSInput").click();
+  } else {
+    document.getElementById("editorSSInput").click();
+  }
 }
 
 /* ----------------------------------------------------------
-   19. POPUP SYSTEM
+   20. POPUP SYSTEM
    ---------------------------------------------------------- */
 function openPopup(name, btnId) {
   const popup = document.getElementById("popup-" + name);
   const btn = document.getElementById(btnId);
-  if (activePopup && activePopup !== popup) { activePopup.style.display = "none"; if (activeBtn) activeBtn.classList.remove("is-active"); }
+  if (activePopup && activePopup !== popup) {
+    activePopup.style.display = "none";
+    if (activeBtn) activeBtn.classList.remove("is-active");
+  }
   if (!popup) return;
-  if (popup.style.display === "flex") { popup.style.display = "none"; if (btn) btn.classList.remove("is-active"); activePopup = null; activeBtn = null; return; }
+  if (popup.style.display === "flex") {
+    popup.style.display = "none";
+    if (btn) btn.classList.remove("is-active");
+    activePopup = null; activeBtn = null;
+    return;
+  }
   popup.style.display = "flex";
   if (btn) btn.classList.add("is-active");
   activePopup = popup;
   activeBtn = btn;
 }
-
 function closeAllPopups() {
   document.querySelectorAll(".editor-popup").forEach(p => p.style.display = "none");
   document.querySelectorAll(".mockup-tool-btn").forEach(b => b.classList.remove("is-active"));
-  activePopup = null;
-  activeBtn = null;
+  activePopup = null; activeBtn = null;
 }
-
 document.addEventListener("click", function (e) {
   if (activePopup && !activePopup.contains(e.target) && !e.target.closest(".mockup-tool-btn")) closeAllPopups();
 });
 
 /* ----------------------------------------------------------
-   20. GENERATE FINAL MOCKUP
+   21. GENERATE FINAL MOCKUP (canvas export)
    ---------------------------------------------------------- */
 async function generateFinalMockup() {
   const btn = document.getElementById("editorGenBtn");
@@ -488,55 +593,86 @@ async function buildCanvasManually() {
   canvas.width = SIZE; canvas.height = SIZE;
   const ctx = canvas.getContext("2d");
 
+  // 1. Background
   const bgLayer = document.getElementById("editorBgLayer");
   const bgType = document.getElementById("editorBgTypeVal")?.value || "solid";
   const bgGrad1 = document.getElementById("editorBgGrad1")?.value;
   const bgGrad2 = document.getElementById("editorBgGrad2")?.value;
-
   if (bgType === "gradient" && bgGrad1 && bgGrad2) {
     const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
-    grad.addColorStop(0, bgGrad1);
-    grad.addColorStop(1, bgGrad2);
+    grad.addColorStop(0, bgGrad1); grad.addColorStop(1, bgGrad2);
     ctx.fillStyle = grad;
   } else {
-    ctx.fillStyle = bgLayer ? bgLayer.style.backgroundColor || bgLayer.style.background || "#c0392b" : "#c0392b";
+    ctx.fillStyle = bgLayer ? (bgLayer.style.backgroundColor || bgLayer.style.background || "#c0392b") : "#c0392b";
   }
   ctx.fillRect(0, 0, SIZE, SIZE);
 
-  const userImg = document.getElementById("editorProcUserImg");
-  const scale = 0.75;
-  const offset = (SIZE - SIZE * scale) / 2;
+  // Phone scale & position (mirrors CSS transform)
+  const phoneScale = phoneZoomed ? 0.95 : 0.75;
+  const phoneSize = SIZE * phoneScale;
+  const phoneOffset = (SIZE - phoneSize) / 2;
 
-  if (userImg && userImg.style.display !== "none" && userImg.src) {
-    const m = SCREEN_MASKS[currentDeviceId] || SCREEN_MASKS["p2"];
-    const mx = offset + m.x * scale, my = offset + m.y * scale;
-    const mw = m.w * scale, mh = m.h * scale;
-    await drawImg(ctx, userImg.src, mx, my, mw, mh, true);
+  const m = SCREEN_MASKS[currentDeviceId] || SCREEN_MASKS["p2"];
+
+  // 2. User screenshot clipped to phone screen mask
+  const userImg = document.getElementById("editorProcUserImg");
+  if (userImg && userImg.src && userImg.src.length > 10 && !userImg.src.endsWith("app/")) {
+    const mx = phoneOffset + m.x * phoneScale;
+    const my = phoneOffset + m.y * phoneScale;
+    const mw = m.w * phoneScale;
+    const mh = m.h * phoneScale;
+    const br = (m.r || 38) * phoneScale;
+
+    ctx.save();
+    ctx.beginPath();
+    roundedRect(ctx, mx, my, mw, mh, br);
+    ctx.clip();
+    await drawImg(ctx, userImg.src, mx, my, mw, mh, false);
+    ctx.restore();
   }
 
+  // 3. Phone frame on top
   const frameImg = document.getElementById("editorProcFrameImg");
   if (frameImg && frameImg.src) {
-    await drawImg(ctx, frameImg.src, offset, offset, SIZE * scale, SIZE * scale, false);
+    await drawImg(ctx, frameImg.src, phoneOffset, phoneOffset, phoneSize, phoneSize, false);
   }
 
+  // 4. Watermarks
   if (wmVisible) {
+    const fontRadio = document.querySelector("input[name=editorFont]:checked");
+    const fontVal = fontRadio ? fontRadio.value.replace(/'/g,"").split(",")[0].trim() : "Pacifico";
+    ctx.font = `32px "${fontVal}"`;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.shadowColor = "rgba(0,0,0,0.6)";
+    ctx.shadowBlur = 10;
+    const dev = DEVICES.find(d => d.id === currentDeviceId);
+    const devName = dev ? dev.name.toUpperCase() : "";
+
+    ctx.textAlign = "left";  ctx.fillText(devName, 85, 110);
+    ctx.textAlign = "right"; ctx.fillText(getFormattedDate(), SIZE - 85, 110);
+
     const wmInput = document.getElementById("editorWmInput");
     const text = wmInput ? wmInput.value.trim() : "";
     if (text) {
-      const fontRadio = document.querySelector("input[name=editorFont]:checked");
-      const fontVal = fontRadio ? fontRadio.value.replace(/'/g,"").split(",")[0].trim() : "Pacifico";
-      ctx.font = `30px "${fontVal}"`;
-      ctx.fillStyle = "rgba(255,255,255,0.85)";
-      ctx.shadowColor = "rgba(0,0,0,0.5)";
-      ctx.shadowBlur = 8;
-      ctx.textAlign = "left";  ctx.fillText(text, 85, 115);
-      ctx.textAlign = "right"; ctx.fillText(text, SIZE - 85, 115);
       ctx.textAlign = "center"; ctx.fillText(text, SIZE / 2, SIZE - 55);
-      ctx.shadowBlur = 0;
     }
+    ctx.shadowBlur = 0;
   }
 
   downloadCanvas(canvas);
+}
+
+function roundedRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 function drawImg(ctx, src, x, y, w, h, clip) {
@@ -544,8 +680,14 @@ function drawImg(ctx, src, x, y, w, h, clip) {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      if (clip) { ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); ctx.drawImage(img, x, y, w, h); ctx.restore(); }
-      else ctx.drawImage(img, x, y, w, h);
+      if (clip) {
+        ctx.save();
+        ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+        ctx.drawImage(img, x, y, w, h);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, x, y, w, h);
+      }
       resolve();
     };
     img.onerror = () => resolve();
@@ -563,7 +705,7 @@ function downloadCanvas(canvas) {
 }
 
 /* ----------------------------------------------------------
-   21. GUIDE BOXES (accordion)
+   22. GUIDE BOXES & SCROLL REVEAL
    ---------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".guide-header").forEach(header => {
@@ -575,12 +717,15 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!isOpen) content.classList.add("open");
     });
   });
-
   document.querySelectorAll(".wp-card").forEach(card => {
     card.classList.add("hidden-state");
     const obs = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) { entry.target.classList.add("scroll-active"); entry.target.classList.remove("hidden-state"); obs.unobserve(entry.target); }
+        if (entry.isIntersecting) {
+          entry.target.classList.add("scroll-active");
+          entry.target.classList.remove("hidden-state");
+          obs.unobserve(entry.target);
+        }
       });
     }, { threshold: 0.1 });
     obs.observe(card);
@@ -588,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* ----------------------------------------------------------
-   22. IMAGE VIEWER
+   23. IMAGE VIEWER
    ---------------------------------------------------------- */
 function openImgViewer(src) {
   const viewer = document.getElementById("imgViewer");
@@ -598,15 +743,13 @@ function openImgViewer(src) {
   viewer.style.display = "flex";
   requestAnimationFrame(() => viewer.classList.add("active"));
 }
-
 function closeImgViewer() {
   const viewer = document.getElementById("imgViewer");
   if (!viewer) return;
   viewer.classList.remove("active");
   setTimeout(() => viewer.style.display = "none", 300);
 }
-
 const imgViewerEl = document.getElementById("imgViewer");
 if (imgViewerEl) imgViewerEl.addEventListener("click", e => { if (e.target === imgViewerEl) closeImgViewer(); });
 
-/* END OF FILE */
+/* END */
