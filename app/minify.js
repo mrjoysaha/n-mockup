@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    minify.js — Nothing Space Mockup Editor
    ========================================================= */
 
@@ -153,7 +153,27 @@ let activeBtn = null;
 let bubbleInterval = null;
 
 /* ----------------------------------------------------------
-   8. INIT EDITOR MODE
+   8. SCALE EDITOR — fit 1000×1000 export area into container
+   ---------------------------------------------------------- */
+function scaleEditor() {
+  const container = document.getElementById("editorScaleContainer");
+  const exportArea = document.getElementById("editorExportArea");
+  if (!container || !exportArea) return;
+  // Use parent width so container can shrink below max-width on small screens
+  const parentW = container.parentElement ? container.parentElement.offsetWidth - 20 : 460;
+  const size = Math.min(container.offsetWidth || container.getBoundingClientRect().width || parentW, 480);
+  if (size < 10) return; // not yet rendered
+  const scale = size / 1000;
+  exportArea.style.transform = `scale(${scale})`;
+  exportArea.style.transformOrigin = "top left";
+  container.style.width = size + "px";
+  container.style.height = size + "px";
+}
+
+window.addEventListener("resize", scaleEditor);
+
+/* ----------------------------------------------------------
+   9. INIT EDITOR MODE
    ---------------------------------------------------------- */
 function initEditorMode() {
   const btn = document.getElementById("initEditBtn");
@@ -166,6 +186,12 @@ function initEditorMode() {
     editorReady = true;
     loadDeviceList();
     applyDevice("p2", "f");
+    // Modal needs a tick to finish layout before we can measure
+    requestAnimationFrame(() => {
+      scaleEditor();
+      // Second pass in case font/resource loading shifted layout
+      setTimeout(scaleEditor, 120);
+    });
   }
 }
 
@@ -195,7 +221,7 @@ function loadDeviceList() {
 }
 
 /* ----------------------------------------------------------
-   10. APPLY DEVICE
+   11. APPLY DEVICE
    ---------------------------------------------------------- */
 function applyDevice(deviceId, side) {
   const dev = DEVICES.find(d => d.id === deviceId);
@@ -206,9 +232,18 @@ function applyDevice(deviceId, side) {
   const src = side === "f" ? dev.f : dev.b;
   if (frameImg) { frameImg.src = src; frameImg.style.opacity = "1"; }
   const m = SCREEN_MASKS[deviceId] || SCREEN_MASKS["p2"];
-  if (mask) { mask.style.left = m.x + "px"; mask.style.top = m.y + "px"; mask.style.width = m.w + "px"; mask.style.height = m.h + "px"; }
+  if (mask) {
+    mask.style.left = m.x + "px";
+    mask.style.top = m.y + "px";
+    mask.style.width = m.w + "px";
+    mask.style.height = m.h + "px";
+  }
+  // Always show the upload hint unless user already uploaded a screenshot
   const userImg = document.getElementById("editorProcUserImg");
-  if (hint && userImg && userImg.style.display === "none") hint.style.display = "flex";
+  const hasScreenshot = userImg && userImg.src && userImg.src !== window.location.href;
+  if (hint) hint.style.display = hasScreenshot ? "none" : "flex";
+  // Re-apply scale in case container changed
+  scaleEditor();
 }
 
 /* ----------------------------------------------------------
